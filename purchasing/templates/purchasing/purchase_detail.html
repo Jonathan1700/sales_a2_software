@@ -1,60 +1,70 @@
 {% extends 'billing/base.html' %}
-{% block title %}Purchase #{{ purchase.id }}{% endblock %}
+{% block title %}Compra #{{ purchase.id }}{% endblock %}
 {% block content %}
-<div class="card shadow mb-4">
-  <div class="card-header bg-dark text-white">
-    <h4>Purchase #{{ purchase.id }}</h4>
+<div class="container py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Detalle de la Compra</h2>
+    <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-outline-secondary">&laquo; Volver al listado</a>
   </div>
-  <div class="card-body">
-    <div class="row mb-3">
-      <div class="col-md-6">
-        <p><strong>Supplier:</strong> {{ purchase.supplier }}</p>
-        <p><strong>Document #:</strong> {{ purchase.document_number }}</p>
+
+  <div class="card shadow mb-4">
+    <div class="card-header bg-dark text-white">
+      <h4 class="mb-0">Compra #{{ purchase.id }}</h4>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <p><strong>Proveedor:</strong> {{ purchase.supplier }}</p>
+          <p><strong>Documento #:</strong> {{ purchase.document_number }}</p>
+        </div>
+        <div class="col-md-6 text-end">
+          <p><strong>Fecha:</strong> {{ purchase.purchase_date|date:"d/m/Y H:i" }}</p>
+          <p><strong>Compra #:</strong> {{ purchase.id }}</p>
+        </div>
       </div>
-      <div class="col-md-6 text-end">
-        <p><strong>Date:</strong> {{ purchase.purchase_date|date:"d/m/Y H:i" }}</p>
-        <p><strong>Purchase #:</strong> {{ purchase.id }}</p>
+
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Producto</th>
+            <th class="text-center">Cantidad</th>
+            <th class="text-end">Costo Unitario</th>
+            <th class="text-end">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detail in purchase.details.all %}
+          <tr>
+            <td>{{ detail.product.name }}</td>
+            <td class="text-center">{{ detail.quantity }}</td>
+            <td class="text-end">${{ detail.unit_cost }}</td>
+            <td class="text-end">${{ detail.subtotal }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-end fw-bold">Subtotal:</td>
+            <td class="text-end">${{ purchase.subtotal }}</td>
+          </tr>
+          <tr>
+            <td colspan="3" class="text-end fw-bold">IVA (15%):</td>
+            <td class="text-end">${{ purchase.tax }}</td>
+          </tr>
+          <tr class="table-warning">
+            <td colspan="3" class="text-end fw-bold fs-5">TOTAL:</td>
+            <td class="text-end fw-bold fs-5">${{ purchase.total }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <hr class="my-4">
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'purchasing:purchase_update' purchase.pk %}" class="btn btn-warning">Editar</a>
+        <a href="{% url 'purchasing:purchase_delete' purchase.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-secondary">Volver</a>
       </div>
     </div>
-
-    <table class="table table-bordered">
-      <thead class="table-dark">
-        <tr>
-          <th>Product</th>
-          <th class="text-center">Qty</th>
-          <th class="text-end">Unit Cost</th>
-          <th class="text-end">Subtotal</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for detail in purchase.details.all %}
-        <tr>
-          <td>{{ detail.product.name }}</td>
-          <td class="text-center">{{ detail.quantity }}</td>
-          <td class="text-end">${{ detail.unit_cost }}</td>
-          <td class="text-end">${{ detail.subtotal }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="3" class="text-end fw-bold">Subtotal:</td>
-          <td class="text-end">${{ purchase.subtotal }}</td>
-        </tr>
-        <tr>
-          <td colspan="3" class="text-end fw-bold">IVA (15%):</td>
-          <td class="text-end">${{ purchase.tax }}</td>
-        </tr>
-        <tr class="table-warning">
-          <td colspan="3" class="text-end fw-bold fs-5">TOTAL:</td>
-          <td class="text-end fw-bold fs-5">${{ purchase.total }}</td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-secondary">Back to list</a>
-    <a href="{% url 'purchasing:purchase_update' purchase.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'purchasing:purchase_delete' purchase.pk %}" class="btn btn-danger">Delete</a>
   </div>
 </div>
 {% endblock %}

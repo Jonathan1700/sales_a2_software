@@ -362,10 +362,20 @@ class ListFeaturesMixin(DynamicColumnsMixin, GenericFilterMixin, ExportListMixin
             f'style="width:48px;height:48px;object-fit:cover;" alt="">'
         )
 
+    def _bool_cell(self, val):
+        """Convierte un valor Sí/No (o booleano) en un badge de color para la tabla."""
+        from django.utils.safestring import mark_safe
+        truthy = str(val).strip().lower() in ('sí', 'si', 'true', '1', 'yes', 'activo')
+        if truthy:
+            return mark_safe('<span class="badge bg-success">Activo</span>')
+        return mark_safe('<span class="badge bg-secondary">Inactivo</span>')
+
     def _cell_value(self, obj, col):
         val = self._resolve(obj, col['accessor'])
         if col.get('image'):
             return self._img_cell(val)
+        if col.get('boolean'):
+            return self._bool_cell(val)
         return val
 
     def get_display_rows(self, object_list):
@@ -423,6 +433,11 @@ class GenericDetailMixin:
             {'label': label, 'value': self._resolve(obj, acc)}
             for label, acc in self.detail_fields
         ]
+        # Flags para el detalle estilo "ficha" (imagen a la izquierda + badge):
+        # la imagen y el estado activo se renderizan aparte, no como fila.
+        field_names = {f.name for f in self.model._meta.get_fields()}
+        ctx['has_image'] = 'image' in field_names
+        ctx['has_active'] = 'is_active' in field_names
         ctx['page_title'] = self.page_title or self.model._meta.verbose_name.title()
         ctx['list_url'] = reverse(self.list_url_name) if self.list_url_name else ''
         ctx['update_url'] = reverse(self.update_url_name, args=[obj.pk]) if self.update_url_name else ''

@@ -10,8 +10,8 @@
 <h2>{{ page_title }}</h2>
 <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
   {% if create_url %}<a href="{{ create_url }}" class="btn btn-primary">+ Nuevo</a>{% endif %}
-  <a href="?export=pdf{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-danger">📄 Export PDF</a>
-  <a href="?export=excel{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-success">📊 Export Excel</a>
+  <a href="?export=pdf{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-danger">📄 Exportar PDF</a>
+  <a href="?export=excel{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-success">📊 Exportar Excel</a>
   <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#columnsModal">
     ⚙ Campos visibles
   </button>
@@ -72,19 +72,19 @@
 <nav>
   <ul class="pagination">
     {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">&laquo; First</a></li>
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Prev</a></li>
+      <li class="page-item"><a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">&laquo; Primera</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Anterior</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link">&laquo; First</span></li>
-      <li class="page-item disabled"><span class="page-link">Prev</span></li>
+      <li class="page-item disabled"><span class="page-link">&laquo; Primera</span></li>
+      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
     {% endif %}
-    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+    <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
     {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Next</a></li>
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">Last &raquo;</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Siguiente</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">Última &raquo;</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link">Next</span></li>
-      <li class="page-item disabled"><span class="page-link">Last &raquo;</span></li>
+      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+      <li class="page-item disabled"><span class="page-link">Última &raquo;</span></li>
     {% endif %}
   </ul>
 </nav>

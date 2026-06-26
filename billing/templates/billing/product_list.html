@@ -9,7 +9,7 @@
   .col-thumb { width:48px; height:48px; object-fit:cover; }
 </style>
 
-<h2>Productosa</h2>
+<h2>Productos</h2>
 <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
   <a href="{% url 'billing:product_create' %}" class="btn btn-primary"> Nuevo Producto </a>
   <a href="?export=pdf{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-danger">📄 Export PDF</a>

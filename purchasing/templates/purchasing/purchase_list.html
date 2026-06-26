@@ -1,11 +1,11 @@
 {% extends 'billing/base.html' %}
-{% block title %}Purchases{% endblock %}
+{% block title %}Compras{% endblock %}
 {% block content %}
 <h2>Compras</h2>
 <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
-  <a href="{% url 'purchasing:purchase_create' %}" class="btn btn-primary">+ New Purchase</a>
-  <a href="?export=pdf{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-danger">📄 Export PDF</a>
-  <a href="?export=excel{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-success">📊 Export Excel</a>
+  <a href="{% url 'purchasing:purchase_create' %}" class="btn btn-primary">+ Nueva Compra</a>
+  <a href="?export=pdf{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-danger">📄 Exportar PDF</a>
+  <a href="?export=excel{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-success">📊 Exportar Excel</a>
   <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#columnsModal">
     ⚙ Campos visibles
   </button>
@@ -63,14 +63,14 @@
   <thead class="table-dark">
     <tr>
       {% if 'id' in visible %}<th>#</th>{% endif %}
-      {% if 'supplier' in visible %}<th>Supplier</th>{% endif %}
-      {% if 'document' in visible %}<th>Document #</th>{% endif %}
-      {% if 'date' in visible %}<th>Date</th>{% endif %}
+      {% if 'supplier' in visible %}<th>Proveedor</th>{% endif %}
+      {% if 'document' in visible %}<th>Documento #</th>{% endif %}
+      {% if 'date' in visible %}<th>Fecha</th>{% endif %}
       {% if 'subtotal' in visible %}<th class="text-end">Subtotal</th>{% endif %}
-      {% if 'tax' in visible %}<th class="text-end">Tax</th>{% endif %}
+      {% if 'tax' in visible %}<th class="text-end">IVA</th>{% endif %}
       {% if 'total' in visible %}<th class="text-end">Total</th>{% endif %}
       {% if 'is_active' in visible %}<th>Activo</th>{% endif %}
-      <th>Actions</th>
+      <th>Acciones</th>
     </tr>
   </thead>
   <tbody>
@@ -93,13 +93,13 @@
       </td>
       {% endif %}
       <td>
-        <a href="{% url 'purchasing:purchase_detail' pur.pk %}" class="btn btn-sm btn-info">View</a>
+        <a href="{% url 'purchasing:purchase_detail' pur.pk %}" class="btn btn-sm btn-info">Ver</a>
         <a href="{% url 'purchasing:purchase_update' pur.pk %}" class="btn btn-sm btn-warning">Editar</a>
-        <a href="{% url 'purchasing:purchase_delete' pur.pk %}" class="btn btn-sm btn-danger">Delete</a>
+        <a href="{% url 'purchasing:purchase_delete' pur.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
       </td>
     </tr>
     {% empty %}
-    <tr><td colspan="{{ total_columns|add:1 }}" class="text-center">No purchases yet.</td></tr>
+    <tr><td colspan="{{ total_columns|add:1 }}" class="text-center">Aún no hay compras.</td></tr>
     {% endfor %}
   </tbody>
 </table>
@@ -108,19 +108,19 @@
 <nav>
   <ul class="pagination">
     {% if page_obj.has_previous %}
-      <li class="page-item"><a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">&laquo; First</a></li>
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Prev</a></li>
+      <li class="page-item"><a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">&laquo; Primera</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Anterior</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link">&laquo; First</span></li>
-      <li class="page-item disabled"><span class="page-link">Prev</span></li>
+      <li class="page-item disabled"><span class="page-link">&laquo; Primera</span></li>
+      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
     {% endif %}
-    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+    <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
     {% if page_obj.has_next %}
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Next</a></li>
-      <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">Last &raquo;</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Siguiente</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">Última &raquo;</a></li>
     {% else %}
-      <li class="page-item disabled"><span class="page-link">Next</span></li>
-      <li class="page-item disabled"><span class="page-link">Last &raquo;</span></li>
+      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+      <li class="page-item disabled"><span class="page-link">Última &raquo;</span></li>
     {% endif %}
   </ul>
 </nav>

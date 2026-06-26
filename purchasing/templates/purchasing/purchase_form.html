@@ -17,17 +17,17 @@
       <!-- ===== Cabecera ===== -->
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-5">
-          <label class="form-label fw-bold">Supplier</label>
+          <label class="form-label fw-bold">Proveedor</label>
           {{ form.supplier }}
           {% for error in form.supplier.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
         </div>
         <div class="col-12 col-md-4">
-          <label class="form-label fw-bold">Document #</label>
+          <label class="form-label fw-bold">Documento #</label>
           {{ form.document_number }}
           {% for error in form.document_number.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
         </div>
         <div class="col-12 col-md-3">
-          <label class="form-label fw-bold">Date</label>
+          <label class="form-label fw-bold">Fecha</label>
           {% if is_edit %}
             <input type="text" class="form-control bg-light" value="{{ object.purchase_date|date:'d/m/Y' }}" readonly>
             <small class="text-muted">Fecha original de la compra (no se modifica).</small>
@@ -40,8 +40,8 @@
 
       <!-- ===== Detalle ===== -->
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="mb-0">Purchase Details</h5>
-        <button type="button" class="btn btn-outline-primary btn-sm" id="addRow">+ Add product</button>
+        <h5 class="mb-0">Detalle de la Compra</h5>
+        <button type="button" class="btn btn-outline-primary btn-sm" id="addRow">+ Agregar producto</button>
       </div>
 
       {{ formset.management_form }}
@@ -49,11 +49,11 @@
       <table class="table table-bordered align-middle" id="detailTable">
         <thead class="table-dark">
           <tr>
-            <th style="width:45%">Product</th>
-            <th style="width:12%">Quantity</th>
-            <th style="width:18%">Unit Cost</th>
+            <th style="width:45%">Producto</th>
+            <th style="width:12%">Cantidad</th>
+            <th style="width:18%">Costo Unitario</th>
             <th class="text-end" style="width:15%">Subtotal</th>
-            <th class="text-center" style="width:10%">Delete</th>
+            <th class="text-center" style="width:10%">Eliminar</th>
           </tr>
         </thead>
         <tbody id="detailRows">

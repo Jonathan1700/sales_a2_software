@@ -105,7 +105,7 @@ class BrandListView(LoginRequiredMixin, ListFeaturesMixin, ListView):
         {'key': 'image',       'label': 'Imagen',         'default': True,  'accessor': _img_url, 'image': True},
         {'key': 'name',        'label': 'Nombre',         'default': True,  'accessor': 'name'},
         {'key': 'description', 'label': 'Descripción',    'default': True,  'accessor': 'description'},
-        {'key': 'is_active',   'label': 'Activo',         'default': True,  'accessor': _yesno},
+        {'key': 'is_active',   'label': 'Activo',         'default': True,  'accessor': _yesno, 'boolean': True},
         {'key': 'created_at',  'label': 'Fecha creación', 'default': False, 'accessor': _dt('created_at')},
     ]
     filters = [
@@ -166,7 +166,7 @@ class ProductGroupListView(LoginRequiredMixin, ListFeaturesMixin, ListView):
     COLUMNS = [
         {'key': 'image',      'label': 'Imagen',         'default': True,  'accessor': _img_url, 'image': True},
         {'key': 'name',       'label': 'Nombre',         'default': True,  'accessor': 'name'},
-        {'key': 'is_active',  'label': 'Activo',         'default': True,  'accessor': _yesno},
+        {'key': 'is_active',  'label': 'Activo',         'default': True,  'accessor': _yesno, 'boolean': True},
         {'key': 'created_at', 'label': 'Fecha creación', 'default': False, 'accessor': _dt('created_at')},
     ]
     filters = [
@@ -231,7 +231,7 @@ class SupplierListView(LoginRequiredMixin, ListFeaturesMixin, ListView):
         {'key': 'email',        'label': 'Email',          'default': True,  'accessor': 'email'},
         {'key': 'phone',        'label': 'Teléfono',       'default': True,  'accessor': 'phone'},
         {'key': 'address',      'label': 'Dirección',      'default': False, 'accessor': 'address'},
-        {'key': 'is_active',    'label': 'Activo',         'default': True,  'accessor': _yesno},
+        {'key': 'is_active',    'label': 'Activo',         'default': True,  'accessor': _yesno, 'boolean': True},
         {'key': 'created_at',   'label': 'Fecha creación', 'default': False, 'accessor': _dt('created_at')},
     ]
     filters = [
@@ -411,7 +411,7 @@ class CustomerListView(LoginRequiredMixin, ListFeaturesMixin, ListView):
         {'key': 'email',      'label': 'Email',          'default': True,  'accessor': 'email'},
         {'key': 'phone',      'label': 'Teléfono',       'default': True,  'accessor': 'phone'},
         {'key': 'address',    'label': 'Dirección',      'default': False, 'accessor': 'address'},
-        {'key': 'is_active',  'label': 'Activo',         'default': True,  'accessor': _yesno},
+        {'key': 'is_active',  'label': 'Activo',         'default': True,  'accessor': _yesno, 'boolean': True},
         {'key': 'created_at', 'label': 'Fecha creación', 'default': False, 'accessor': _dt('created_at')},
     ]
     filters = [

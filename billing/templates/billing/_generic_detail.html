@@ -1,4 +1,5 @@
 {% extends 'billing/base.html' %}
+{% load static %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block content %}
 <div class="container py-3">
@@ -9,18 +10,53 @@
 
   <div class="card shadow-sm border-0">
     <div class="card-body p-4">
-      <dl class="row mb-0">
-        {% for r in detail_rows %}
-        <dt class="col-sm-3 text-muted">{{ r.label }}</dt>
-        <dd class="col-sm-9">{{ r.value|default:"—" }}</dd>
-        {% endfor %}
-      </dl>
+      <div class="row g-4 align-items-start">
 
-      <hr class="my-4">
-      <div class="d-flex flex-wrap gap-2">
-        {% if update_url %}<a href="{{ update_url }}" class="btn btn-warning">Editar</a>{% endif %}
-        {% if delete_url %}<a href="{{ delete_url }}" class="btn btn-danger">Eliminar</a>{% endif %}
-        <a href="{{ list_url }}" class="btn btn-secondary">Volver</a>
+        <!-- Columna izquierda: imagen (solo si el modelo la tiene) -->
+        {% if has_image %}
+        <div class="col-12 col-md-5 text-center">
+          {% if object.image %}
+            <img src="{{ object.image.url }}" alt="{{ object }}"
+                 class="img-fluid rounded shadow-sm"
+                 style="max-height:380px;object-fit:contain;">
+          {% else %}
+            <img src="{% static 'billing/no-image.svg' %}" alt="Sin imagen"
+                 class="img-fluid rounded shadow-sm border"
+                 style="max-height:380px;object-fit:contain;">
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Columna derecha: datos -->
+        <div class="{% if has_image %}col-12 col-md-7{% else %}col-12{% endif %}">
+          <h3 class="fw-bold mb-1">{{ object }}</h3>
+          {% if has_active %}
+          <p class="text-muted mb-3">
+            {% if object.is_active %}
+              <span class="badge bg-success">Activo</span>
+            {% else %}
+              <span class="badge bg-secondary">Inactivo</span>
+            {% endif %}
+          </p>
+          {% endif %}
+
+          <dl class="row mb-0">
+            {% for r in detail_rows %}
+              {% if r.label != 'Imagen' and r.label != 'Activo' %}
+              <dt class="col-sm-4 text-muted">{{ r.label }}</dt>
+              <dd class="col-sm-8">{{ r.value|default:"—" }}</dd>
+              {% endif %}
+            {% endfor %}
+          </dl>
+
+          <hr class="my-4">
+          <div class="d-flex flex-wrap gap-2">
+            {% if update_url %}<a href="{{ update_url }}" class="btn btn-warning">Editar</a>{% endif %}
+            {% if delete_url %}<a href="{{ delete_url }}" class="btn btn-danger">Eliminar</a>{% endif %}
+            <a href="{{ list_url }}" class="btn btn-secondary">Volver</a>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

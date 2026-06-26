@@ -1,17 +1,17 @@
 {% extends 'billing/base.html' %}
-{% block title %}Delete Purchase{% endblock %}
+{% block title %}Eliminar Compra{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-6">
     <div class="card shadow border-danger">
-      <div class="card-header bg-danger text-white"><h4>Delete</h4></div>
+      <div class="card-header bg-danger text-white"><h4>Eliminar</h4></div>
       <div class="card-body">
-        <p>Are you sure you want to delete <strong>{{ object }}</strong>?</p>
+        <p>¿Seguro que deseas eliminar <strong>{{ object }}</strong>?</p>
         <p class="text-muted small">Esto revertirá el stock que esta compra había sumado.</p>
         <form method="post">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger">Yes, Delete</button>
-          <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+          <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-secondary">Cancelar</a>
         </form>
       </div>
     </div>
