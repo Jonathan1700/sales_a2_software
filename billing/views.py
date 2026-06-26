@@ -573,6 +573,56 @@ def invoice_create(request):
 
 
 @login_required
+def invoice_update(request, pk):
+    """Edita una factura existente y sus líneas; recalcula totales."""
+    invoice = get_object_or_404(Invoice, pk=pk)
+
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST, instance=invoice)
+        formset = InvoiceDetailFormSet(request.POST, instance=invoice)
+
+        if form.is_valid() and formset.is_valid():
+            # Igual que al crear: la factura no puede quedar sin líneas.
+            has_detail = any(
+                f.cleaned_data.get('product') and not f.cleaned_data.get('DELETE')
+                for f in formset.forms
+            )
+            if not has_detail:
+                messages.error(request, 'Debes agregar al menos un producto a la factura.')
+            else:
+                invoice = form.save()
+                formset.instance = invoice
+                formset.save()
+
+                subtotal = sum(d.subtotal for d in invoice.details.all())
+                invoice.subtotal = subtotal
+                invoice.tax = subtotal * Decimal('0.15')  # IVA 15%
+                invoice.total = invoice.subtotal + invoice.tax
+                invoice.save()
+
+                messages.success(request, f'¡Factura #{invoice.id} actualizada! Total: ${invoice.total}')
+                return redirect('billing:invoice_detail', pk=invoice.pk)
+    else:
+        form = InvoiceForm(instance=invoice)
+        formset = InvoiceDetailFormSet(instance=invoice)
+
+    product_prices = {
+        str(p.id): str(p.unit_price)
+        for p in Product.objects.filter(is_active=True)
+    }
+
+    return render(request, 'billing/invoice_form.html', {
+        'form': form,
+        'formset': formset,
+        'title': f'Editar Factura #{invoice.id}',
+        'product_prices_json': json.dumps(product_prices),
+        'today': invoice.invoice_date,
+        'is_edit': True,
+        'object': invoice,
+    })
+
+
+@login_required
 def invoice_detail(request, pk):
     """Muestra el detalle completo de una factura."""
     invoice = get_object_or_404(

@@ -94,6 +94,7 @@
       {% endif %}
       <td>
         <a href="{% url 'purchasing:purchase_detail' pur.pk %}" class="btn btn-sm btn-info">View</a>
+        <a href="{% url 'purchasing:purchase_update' pur.pk %}" class="btn btn-sm btn-warning">Editar</a>
         <a href="{% url 'purchasing:purchase_delete' pur.pk %}" class="btn btn-sm btn-danger">Delete</a>
       </td>
     </tr>

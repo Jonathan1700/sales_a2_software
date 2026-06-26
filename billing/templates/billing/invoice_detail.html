@@ -55,6 +55,7 @@
     </table>
 
     <a href="{% url 'billing:invoice_list' %}" class="btn btn-secondary">Back to list</a>
+    <a href="{% url 'billing:invoice_update' invoice.pk %}" class="btn btn-warning">Editar</a>
     <a href="{% url 'billing:invoice_delete' invoice.pk %}" class="btn btn-danger">Delete</a>
   </div>
 </div>

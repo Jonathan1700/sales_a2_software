@@ -53,6 +53,7 @@
     </table>
 
     <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-secondary">Back to list</a>
+    <a href="{% url 'purchasing:purchase_update' purchase.pk %}" class="btn btn-warning">Editar</a>
     <a href="{% url 'purchasing:purchase_delete' purchase.pk %}" class="btn btn-danger">Delete</a>
   </div>
 </div>

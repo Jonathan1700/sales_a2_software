@@ -4,7 +4,11 @@
 <div class="card shadow border-0">
   <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
     <h4 class="mb-0">{{ title }}</h4>
-    <span class="badge bg-warning text-dark">New</span>
+    {% if is_edit %}
+      <span class="badge bg-info text-dark">Editando</span>
+    {% else %}
+      <span class="badge bg-warning text-dark">New</span>
+    {% endif %}
   </div>
   <div class="card-body">
     <form method="post" id="purchaseForm">
@@ -24,8 +28,13 @@
         </div>
         <div class="col-12 col-md-3">
           <label class="form-label fw-bold">Date</label>
-          <input type="text" class="form-control bg-light" value="{% now 'd/m/Y' %}" readonly>
-          <small class="text-muted">Se registra hoy.</small>
+          {% if is_edit %}
+            <input type="text" class="form-control bg-light" value="{{ object.purchase_date|date:'d/m/Y' }}" readonly>
+            <small class="text-muted">Fecha original de la compra (no se modifica).</small>
+          {% else %}
+            <input type="text" class="form-control bg-light" value="{% now 'd/m/Y' %}" readonly>
+            <small class="text-muted">Se registra hoy.</small>
+          {% endif %}
         </div>
       </div>
 
@@ -85,8 +94,8 @@
       </table>
 
       <div class="mt-3">
-        <button type="submit" class="btn btn-warning">Create Purchase</button>
-        <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-warning">{% if is_edit %}Guardar cambios{% else %}Create Purchase{% endif %}</button>
+        <a href="{% url 'purchasing:purchase_list' %}" class="btn btn-secondary">Cancelar</a>
       </div>
     </form>
   </div>

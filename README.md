@@ -5,14 +5,26 @@ modelos, admin, auth, CRUD (FBV + CBV), carpeta `shared/`
 (mixin staff, decorador de auditoría, validador de cédula EC),
 home/dashboard, logout POST y factura con formset.
 
+## Autores
+
+Proyecto desarrollado por el equipo **Software A2**:
+
+- **José Antonio Torres Torres**
+- **Jonathan Gabriel Castro Belfor**
+
+**Universidad Estatal de Milagro (UNEMI)** — Ingeniería en Software,
+cuarto semestre.
+
 ## Estructura
 
 ```
 Sales_A2/
-├── config/          # Proyecto Django (settings, urls, wsgi/asgi)
-├── billing/         # App principal (models, views, forms, urls, admin, templates)
-├── shared/          # Código reutilizable (mixins, decorators, validators) — NO es app
+├── config/          # Proyecto Django (settings, urls, wsgi/asgi) — DJANGO_SETTINGS_MODULE
+├── billing/         # App principal: Brand, ProductGroup, Supplier, Product, Customer, Invoice
+├── purchasing/      # App de Compras: Purchase, PurchaseDetail (reutiliza modelos de billing)
+├── shared/          # Código reutilizable (mixins, columns, decorators, validators) — NO es app
 ├── templates/registration/  # login.html, signup.html
+├── media/           # Imágenes subidas (brands, groups, suppliers, products)
 ├── manage.py
 └── requirements.txt
 ```
@@ -246,4 +258,50 @@ nunca se compró), editable siempre.
 
 `PurchaseAdmin` registra `Purchase` con `PurchaseDetailInline` (`TabularInline`)
 y `list_display = (id, supplier, document_number, purchase_date, total)`.
+
+## Columnas dinámicas en Facturas y Compras (FBV)
+
+La funcionalidad **⚙ Campos visibles** (que en Productos provee
+`DynamicColumnsMixin`, solo para vistas CBV) se extendió a los listados de
+**Facturas** (`billing:invoice_list`) y **Compras** (`purchasing:purchase_list`),
+que son **FBV** porque usan formsets maestro–detalle.
+
+Para no duplicar lógica se creó un helper funcional reutilizable:
+
+### `shared/columns.py`
+
+| Función | Qué hace |
+|---------|----------|
+| `get_visible_columns(request, COLUMNS, session_key)` | Resuelve las columnas visibles con la prioridad **GET (al aplicar) → sesión → defaults**; persiste en sesión; mínimo 1 columna. |
+| `columns_context(request, COLUMNS, session_key)` | Devuelve el contexto para la plantilla: `visible`, `columns` (checklist), `visible_count`, `total_columns`. |
+| `visible_export(COLUMNS, visible, queryset)` | Genera `(headers, rows)` para PDF/Excel usando **solo** las columnas visibles, en el orden de `COLUMNS`. |
+
+`COLUMNS` es la **fuente única** (tabla + PDF + Excel), igual que en Productos:
+
+```python
+INVOICE_COLUMNS = [
+    {'key': 'id',       'label': '#',        'default': True,  'accessor': 'id'},
+    {'key': 'customer', 'label': 'Cliente',  'default': True,  'accessor': lambda o: str(o.customer)},
+    {'key': 'total',    'label': 'Total',    'default': True,  'accessor': 'total'},
+    {'key': 'is_active','label': 'Activo',   'default': False, 'accessor': lambda o: 'Sí' if o.is_active else 'No'},
+    # ...
+]
+```
+
+- Cada listado usa su propia clave de sesión independiente:
+  `invoice_visible_columns` y `purchase_visible_columns`.
+- El modal (botón **⚙ Campos visibles**, **Aplicar**, **Seleccionar todo**,
+  **Restablecer configuración**) conserva los filtros activos vía inputs ocultos.
+- Las exportaciones a PDF/Excel respetan las columnas elegidas.
+- Las plantillas (`invoice_list.html`, `purchase_list.html`) renderizan cada
+  celda condicionalmente con `{% if 'key' in visible %}`.
+
+### Resumen: dónde está disponible "Campos visibles"
+
+| Listado | Tipo de vista | Mecanismo |
+|---------|---------------|-----------|
+| Productos | CBV | `DynamicColumnsMixin` |
+| Marcas, Categorías, Proveedores, Clientes | CBV | `ListFeaturesMixin` (incluye el mixin) |
+| **Facturas** | FBV | `shared/columns.py` |
+| **Compras** | FBV | `shared/columns.py` |
 

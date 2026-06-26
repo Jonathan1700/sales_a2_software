@@ -149,6 +149,102 @@ def purchase_create(request):
 
 
 @login_required
+def purchase_update(request, pk):
+    """Edita una compra existente; ajusta el stock por la DIFERENCIA de cantidades."""
+    purchase = get_object_or_404(
+        Purchase.objects.prefetch_related('details__product'), pk=pk
+    )
+
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST, instance=purchase)
+        formset = PurchaseDetailFormSet(request.POST, instance=purchase)
+
+        if form.is_valid() and formset.is_valid():
+            has_detail = any(
+                f.cleaned_data.get('product') and not f.cleaned_data.get('DELETE')
+                for f in formset.forms
+            )
+            if not has_detail:
+                messages.error(request, 'Debes agregar al menos un producto a la compra.')
+            else:
+                # Cantidades actuales en BD (lo que esta compra YA sumó al stock)
+                old_qty = {}
+                for d in purchase.details.all():
+                    old_qty[d.product_id] = old_qty.get(d.product_id, 0) + d.quantity
+
+                # Cantidades nuevas según el formulario (aún sin guardar)
+                new_qty = {}
+                for f in formset.forms:
+                    cd = f.cleaned_data
+                    if not cd or cd.get('DELETE'):
+                        continue
+                    product = cd.get('product')
+                    if not product:
+                        continue
+                    new_qty[product.id] = new_qty.get(product.id, 0) + cd.get('quantity', 0)
+
+                # Validar ANTES de guardar: ningún producto puede quedar negativo
+                negativo = None
+                for pid in set(old_qty) | set(new_qty):
+                    delta = new_qty.get(pid, 0) - old_qty.get(pid, 0)
+                    product = Product.objects.get(pk=pid)
+                    if product.stock + delta < 0:
+                        negativo = product
+                        break
+
+                if negativo is not None:
+                    messages.error(
+                        request,
+                        f'No se puede guardar: "{negativo.name}" quedaría con stock '
+                        f'negativo (hay {negativo.stock}). Probablemente ya se vendió.'
+                    )
+                else:
+                    purchase = form.save()
+                    formset.instance = purchase
+                    formset.save()
+
+                    # Aplicar el delta de stock por producto
+                    for pid in set(old_qty) | set(new_qty):
+                        delta = new_qty.get(pid, 0) - old_qty.get(pid, 0)
+                        if delta:
+                            product = Product.objects.get(pk=pid)
+                            product.stock += delta
+                            product.save(update_fields=['stock'])
+
+                    # Recalcular totales
+                    subtotal = sum(d.subtotal for d in purchase.details.all())
+                    purchase.subtotal = subtotal
+                    purchase.tax = subtotal * Decimal('0.15')   # IVA 15%
+                    purchase.total = purchase.subtotal + purchase.tax
+                    purchase.save()
+
+                    messages.success(request, f'¡Compra #{purchase.id} actualizada! Stock ajustado.')
+                    return redirect('purchasing:purchase_detail', pk=purchase.pk)
+    else:
+        form = PurchaseForm(instance=purchase)
+        formset = PurchaseDetailFormSet(instance=purchase)
+
+    # Sugerencia de costo (igual que al crear)
+    product_costs = {
+        str(p.id): str(p.unit_price)
+        for p in Product.objects.filter(is_active=True)
+    }
+    for d in (PurchaseDetail.objects
+              .select_related('product')
+              .order_by('purchase__purchase_date')):
+        product_costs[str(d.product_id)] = str(d.unit_cost)
+
+    return render(request, 'purchasing/purchase_form.html', {
+        'form': form,
+        'formset': formset,
+        'title': f'Editar Compra #{purchase.id}',
+        'product_costs_json': json.dumps(product_costs),
+        'is_edit': True,
+        'object': purchase,
+    })
+
+
+@login_required
 def purchase_detail(request, pk):
     """Muestra el detalle completo de una compra."""
     purchase = get_object_or_404(

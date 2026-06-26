@@ -88,6 +88,7 @@
       {% endif %}
       <td>
         <a href="{% url 'billing:invoice_detail' inv.pk %}" class="btn btn-sm btn-info">Ver</a>
+        <a href="{% url 'billing:invoice_update' inv.pk %}" class="btn btn-sm btn-warning">Editar</a>
         <a href="{% url 'billing:invoice_delete' inv.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
       </td>
     </tr>
