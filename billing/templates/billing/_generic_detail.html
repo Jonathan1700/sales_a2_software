@@ -1,0 +1,28 @@
+{% extends 'billing/base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+<div class="container py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">{{ page_title }}</h2>
+    <a href="{{ list_url }}" class="btn btn-outline-secondary">&laquo; Volver al listado</a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+      <dl class="row mb-0">
+        {% for r in detail_rows %}
+        <dt class="col-sm-3 text-muted">{{ r.label }}</dt>
+        <dd class="col-sm-9">{{ r.value|default:"—" }}</dd>
+        {% endfor %}
+      </dl>
+
+      <hr class="my-4">
+      <div class="d-flex flex-wrap gap-2">
+        {% if update_url %}<a href="{{ update_url }}" class="btn btn-warning">Editar</a>{% endif %}
+        {% if delete_url %}<a href="{{ delete_url }}" class="btn btn-danger">Eliminar</a>{% endif %}
+        <a href="{{ list_url }}" class="btn btn-secondary">Volver</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

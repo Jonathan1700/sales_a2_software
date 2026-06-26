@@ -1,0 +1,188 @@
+{% extends 'billing/base.html' %}
+{% block title %}Facturas{% endblock %}
+{% block content %}
+<h2>Facturas</h2>
+<div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+  <a href="{% url 'billing:invoice_create' %}" class="btn btn-primary">+ Nueva Factura</a>
+  <a href="?export=pdf{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-danger">📄 Exportar PDF</a>
+  <a href="?export=excel{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-success">📊 Exportar Excel</a>
+  <button type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#columnsModal">
+    ⚙ Campos visibles
+  </button>
+  <span class="badge bg-secondary ms-auto">Mostrando {{ visible_count }} de {{ total_columns }} columnas</span>
+</div>
+
+<!-- ===== Filtros ===== -->
+<form method="get" class="card card-body mb-3">
+  <div class="row g-2">
+    <div class="col-md-3">
+      <label class="form-label">Cliente</label>
+      <select name="customer" class="form-select">
+        <option value="">Todos</option>
+        {% for c in customers %}
+          <option value="{{ c.id }}" {% if filters.customer == c.id|stringformat:"s" %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Desde</label>
+      <input type="date" name="date_from" value="{{ filters.date_from }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Hasta</label>
+      <input type="date" name="date_to" value="{{ filters.date_to }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Total mín</label>
+      <input type="number" step="0.01" name="total_min" value="{{ filters.total_min }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Total máx</label>
+      <input type="number" step="0.01" name="total_max" value="{{ filters.total_max }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Activo</label>
+      <select name="is_active" class="form-select">
+        <option value="">Todos</option>
+        <option value="1" {% if filters.is_active == "1" %}selected{% endif %}>Sí</option>
+        <option value="0" {% if filters.is_active == "0" %}selected{% endif %}>No</option>
+      </select>
+    </div>
+  </div>
+  <div class="mt-3">
+    <button type="submit" class="btn btn-primary">Buscar</button>
+    <a href="{% url 'billing:invoice_list' %}" class="btn btn-secondary">Limpiar</a>
+  </div>
+</form>
+
+<table class="table table-striped table-hover">
+  <thead class="table-dark">
+    <tr>
+      {% if 'id' in visible %}<th>#</th>{% endif %}
+      {% if 'customer' in visible %}<th>Cliente</th>{% endif %}
+      {% if 'date' in visible %}<th>Fecha</th>{% endif %}
+      {% if 'subtotal' in visible %}<th class="text-end">Subtotal</th>{% endif %}
+      {% if 'tax' in visible %}<th class="text-end">IVA</th>{% endif %}
+      {% if 'total' in visible %}<th class="text-end">Total</th>{% endif %}
+      {% if 'is_active' in visible %}<th>Activo</th>{% endif %}
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for inv in items %}
+    <tr>
+      {% if 'id' in visible %}<td>{{ inv.id }}</td>{% endif %}
+      {% if 'customer' in visible %}<td>{{ inv.customer }}</td>{% endif %}
+      {% if 'date' in visible %}<td>{{ inv.invoice_date|date:"d/m/Y" }}</td>{% endif %}
+      {% if 'subtotal' in visible %}<td class="text-end">${{ inv.subtotal }}</td>{% endif %}
+      {% if 'tax' in visible %}<td class="text-end">${{ inv.tax }}</td>{% endif %}
+      {% if 'total' in visible %}<td class="text-end fw-bold">${{ inv.total }}</td>{% endif %}
+      {% if 'is_active' in visible %}
+      <td>
+        {% if inv.is_active %}
+          <span class="badge bg-success">Sí</span>
+        {% else %}
+          <span class="badge bg-secondary">No</span>
+        {% endif %}
+      </td>
+      {% endif %}
+      <td>
+        <a href="{% url 'billing:invoice_detail' inv.pk %}" class="btn btn-sm btn-info">Ver</a>
+        <a href="{% url 'billing:invoice_delete' inv.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="{{ total_columns|add:1 }}" class="text-center">Aún no hay facturas.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+<nav>
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">&laquo; Primera</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Anterior</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo; Primera</span></li>
+      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+    {% endif %}
+    <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">Siguiente</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">Última &raquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+      <li class="page-item disabled"><span class="page-link">Última &raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+<!-- ===== Modal: selección de columnas ===== -->
+<div class="modal fade" id="columnsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow">
+      <form method="get" id="columnsForm">
+        <!-- conservar filtros activos -->
+        {% if filters.customer %}<input type="hidden" name="customer" value="{{ filters.customer }}">{% endif %}
+        {% if filters.date_from %}<input type="hidden" name="date_from" value="{{ filters.date_from }}">{% endif %}
+        {% if filters.date_to %}<input type="hidden" name="date_to" value="{{ filters.date_to }}">{% endif %}
+        {% if filters.total_min %}<input type="hidden" name="total_min" value="{{ filters.total_min }}">{% endif %}
+        {% if filters.total_max %}<input type="hidden" name="total_max" value="{{ filters.total_max }}">{% endif %}
+        {% if filters.is_active %}<input type="hidden" name="is_active" value="{{ filters.is_active }}">{% endif %}
+
+        <div class="modal-header">
+          <h5 class="modal-title">⚙ Campos visibles</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted small">Marca las columnas que deseas ver. Mínimo una columna.</p>
+          <div class="row">
+            {% for col in columns %}
+            <div class="col-12 col-sm-6 col-md-4">
+              <div class="form-check">
+                <input class="form-check-input col-check" type="checkbox" name="columns"
+                       value="{{ col.key }}" id="col_{{ col.key }}" {% if col.checked %}checked{% endif %}>
+                <label class="form-check-label" for="col_{{ col.key }}">{{ col.label }}</label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div id="colsWarning" class="text-danger small mt-2 d-none">Selecciona al menos una columna.</div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <div>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="selectAllCols">Seleccionar todo</button>
+            <a href="?reset_columns=1{% if querystring %}&{{ querystring }}{% endif %}" class="btn btn-outline-warning btn-sm">Restablecer configuración</a>
+          </div>
+          <div>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="applyCols">Aplicar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const form = document.getElementById('columnsForm');
+  const checks = () => Array.from(document.querySelectorAll('.col-check'));
+  const warning = document.getElementById('colsWarning');
+
+  document.getElementById('selectAllCols').addEventListener('click', function () {
+    checks().forEach(c => c.checked = true);
+    warning.classList.add('d-none');
+  });
+
+  form.addEventListener('submit', function (e) {
+    if (!checks().some(c => c.checked)) {
+      e.preventDefault();
+      warning.classList.remove('d-none');
+    }
+  });
+})();
+</script>
+{% endblock %}

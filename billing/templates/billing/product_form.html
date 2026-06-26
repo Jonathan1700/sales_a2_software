@@ -1,0 +1,175 @@
+{% extends 'billing/base.html' %}
+{% load static %}
+{% block title %}Product{% endblock %}
+{% block content %}
+<div class="container py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">{% if form.instance.pk %}✏ Editar Producto{% else %}➕ Nuevo Producto{% endif %}</h2>
+    <a href="{% url 'billing:product_list' %}" class="btn btn-outline-secondary">&laquo; Volver al listado</a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="row g-4">
+      <!-- ===== Columna izquierda: Información ===== -->
+      <div class="col-12 col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-primary text-white"><h5 class="mb-0">📋 Información del producto</h5></div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-bold" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.help_text %}<small class="text-muted">{{ form.name.help_text }}</small>{% endif %}
+                {% for e in form.name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold" for="{{ form.brand.id_for_label }}">{{ form.brand.label }}</label>
+                {{ form.brand }}
+                {% if form.brand.help_text %}<small class="text-muted">{{ form.brand.help_text }}</small>{% endif %}
+                {% for e in form.brand.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold" for="{{ form.group.id_for_label }}">{{ form.group.label }}</label>
+                {{ form.group }}
+                {% if form.group.help_text %}<small class="text-muted">{{ form.group.help_text }}</small>{% endif %}
+                {% for e in form.group.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold" for="{{ form.unit_price.id_for_label }}">{{ form.unit_price.label }}</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  {{ form.unit_price }}
+                </div>
+                {% if form.unit_price.help_text %}<small class="text-muted">{{ form.unit_price.help_text }}</small>{% endif %}
+                <div class="text-danger small" id="priceClientError"></div>
+                {% for e in form.unit_price.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold" for="{{ form.stock.id_for_label }}">{{ form.stock.label }}</label>
+                {{ form.stock }}
+                {% if form.stock.help_text %}<small class="text-muted">{{ form.stock.help_text }}</small>{% endif %}
+                {% for e in form.stock.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold" for="{{ form.suppliers.id_for_label }}">{{ form.suppliers.label }}</label>
+                {{ form.suppliers }}
+                {% if form.suppliers.help_text %}<small class="text-muted">{{ form.suppliers.help_text }}</small>{% endif %}
+                {% for e in form.suppliers.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% for e in form.description.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+              </div>
+
+              <div class="col-12">
+                <div class="form-check">
+                  {{ form.is_active }}
+                  <label class="form-check-label fw-bold" for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Columna derecha: Imagen + resumen ===== -->
+      <div class="col-12 col-lg-5">
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-header bg-dark text-white"><h5 class="mb-0">🖼 Imagen</h5></div>
+          <div class="card-body text-center">
+            <img id="imagePreview"
+                 src="{% if form.instance.image %}{{ form.instance.image.url }}{% else %}{% static 'billing/no-image.svg' %}{% endif %}"
+                 alt="Vista previa"
+                 class="img-fluid rounded border mb-3"
+                 style="width:100%;max-height:260px;object-fit:contain;background:#f8f9fa;">
+            <label class="form-label fw-bold d-block text-start" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+            {{ form.image }}
+            {% if form.image.help_text %}<small class="text-muted d-block text-start">{{ form.image.help_text }}</small>{% endif %}
+            {% for e in form.image.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-success text-white"><h5 class="mb-0">💰 Resumen</h5></div>
+          <div class="card-body">
+            <label class="form-label fw-bold">Balance (Precio × Stock)</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input type="text" id="balanceField" class="form-control fw-bold text-success fs-5 bg-light"
+                     value="0.00" readonly>
+            </div>
+            <small class="text-muted">Se calcula automáticamente.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">💾 Guardar</button>
+      <a href="{% url 'billing:product_list' %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<script>
+(function () {
+  const priceEl   = document.getElementById('id_unit_price');
+  const stockEl   = document.getElementById('id_stock');
+  const balanceEl = document.getElementById('balanceField');
+  const imageEl   = document.getElementById('id_image');
+  const preview   = document.getElementById('imagePreview');
+  const priceErr  = document.getElementById('priceClientError');
+
+  // --- Balance dinámico ---
+  function fmt(n) {
+    return n.toLocaleString('es-EC', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function recalc() {
+    const p = parseFloat(priceEl.value) || 0;
+    const s = parseInt(stockEl.value, 10) || 0;
+    balanceEl.value = fmt(p * s);
+  }
+  // --- Validación inmediata de precio ---
+  function validatePrice() {
+    const p = parseFloat(priceEl.value);
+    if (priceEl.value !== '' && (isNaN(p) || p <= 0)) {
+      priceErr.textContent = 'El precio unitario debe ser mayor que cero.';
+      priceEl.classList.add('is-invalid');
+    } else {
+      priceErr.textContent = '';
+      priceEl.classList.remove('is-invalid');
+    }
+  }
+
+  if (priceEl) priceEl.addEventListener('input', function () { recalc(); validatePrice(); });
+  if (stockEl) stockEl.addEventListener('input', recalc);
+
+  // --- Vista previa de imagen ---
+  if (imageEl) {
+    imageEl.addEventListener('change', function () {
+      const file = this.files && this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => { preview.src = e.target.result; };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  recalc();  // valor inicial (incluye modo edición)
+})();
+</script>
+{% endblock %}

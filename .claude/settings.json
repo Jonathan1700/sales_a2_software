@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(& \"d:\\\\Sales_A2\\\\ent_sales_A2\\\\Scripts\\\\python.exe\" d:\\\\Sales_A2\\\\manage.py check 2>&1)",
+      "PowerShell(& \"d:\\\\Sales_A2\\\\ent_sales_A2\\\\Scripts\\\\python.exe\" -m pip install openpyxl reportlab 2>&1)",
+      "PowerShell(& \"d:\\\\Sales_A2\\\\ent_sales_A2\\\\Scripts\\\\python.exe\" d:\\\\Sales_A2\\\\manage.py makemigrations billing 2>&1)",
+      "PowerShell(& \"d:\\\\Sales_A2\\\\ent_sales_A2\\\\Scripts\\\\python.exe\" d:\\\\Sales_A2\\\\manage.py migrate 2>&1)",
+      "Bash(command -v pandoc)",
+      "Bash(pandoc --version)",
+      "Bash(python -c \"import docx; print\\('python-docx OK', docx.__version__\\)\")"
+    ]
+  }
+}
