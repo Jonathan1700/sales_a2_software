@@ -693,3 +693,7 @@
   # ...:     print(i.brand.name, "-", i.group.name)
 
 #In [56]: Brand.objects.annotate(cantidad = Count('products')).order_by('-cantidad').filter(cantidad__gt = 2).values('name', 'cantidad')
+
+#In [62]: te = Purchase.objects.select_related('supplier')
+   # ...: for x in te:
+   # ...:     print(x.id, "--", x.supplier.name)
