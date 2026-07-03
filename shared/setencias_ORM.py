@@ -621,3 +621,75 @@
 
 #Execution time: 0.003150s [Database: default]
 #Out[21]: {'avg': Decimal('662.350700000000')}
+
+#In [59]: Brand.objects.annotate(Total = Count('products')).values('name', 'Total')
+
+  #In [20]: eje2 = Brand.objects.prefetch_related('products')
+    #...: for e in eje2:
+    #...:     for ej in e.products.all():
+    #...:         print(e.name, "-", ej.name)
+    
+    
+    #In [11]: ej5 = Product.objects.select_related('group')
+    #...: for r in ej5:
+    #...:     print(r.name, "--", r.group.name)
+    
+    
+    
+#In [13]: eje6 = Supplier.objects.prefetch_related('products')
+   # ...: for t in eje6:
+    #...:     for n in t.products.all():
+    #...:         print(t.name, "--", n.name)
+    
+    
+#In [2]: eje6 = Supplier.objects.prefetch_related('products')
+   #...: for t in eje6:
+   #...:     for n in t.products.all():
+   #...:         print(t.name, "--", n.name)
+   
+   
+   #In [9]: Product.objects.filter((Q(brand__name = "Samsung") | Q(brand__name = "LG")) & Q(stock__gt = 10))
+   #<QuerySet [<Product: Galaxy S23 (Samsung)>, <Product: Galaxy S24 (Samsung)>, <Product: Prueba 3 (Samsung)>, <Product: Teclado Mecánico (Samsung)>]>
+   
+   
+   
+#In [16]: ej1 = Invoice.objects.select_related('customer')
+#    ...: for a in ej1:
+  #  ...:     print(a.id, "-", a.customer.first_name)
+  
+  
+  #n [19]: ej2 = Brand.objects.prefetch_related('products')
+   # ...: for b in ej2:
+   # ...:     for a in b.products.all():
+    #...:         print(b.name, "===", a.name)
+    
+    
+   # In [27]: ej3 = InvoiceDetail.objects.select_related('product_id')
+    #...: for c in ej3:
+    #...:     print(c.product.name, "x", c.quantity)
+    
+    
+#In [31]: eje4 = Purchase.objects.select_related('supplier')
+ #   ...: for m in eje4:
+   # ...:     print(m.id, "--", m.supplier.name)
+   
+   #In [51]: Brand.objects.annotate(cantidad = Count('products')).order_by('-cantidad').first()
+
+
+#In [36]: Brand.objects.annotate(Cantidad = Count('products')).order_by('Cantidad').first()
+#Execution time: 0.000154s [Database: default]
+#Out[36]: <Brand: Bose>
+
+#In [37]: Customer.objects.annotate(Total = Sum('invoices__total')).order_by('-Total').first()
+#Execution time: 0.000242s [Database: default]
+#Out[37]: <Customer: Benítez, Lucía>
+
+#In [58]: Product.objects.filter(Q(brand__name="LG") & Q(is_active=True))
+#Execution time: 0.000107s [Database: default]
+#<QuerySet [<Product: Refrigeradora No Frost (LG)>, <Product: Smart TV 55" (LG)>]>
+
+#In [7]: pe = Product.objects.select_related('brand', 'group')
+ #  ...: for i in pe:
+  # ...:     print(i.brand.name, "-", i.group.name)
+
+#In [56]: Brand.objects.annotate(cantidad = Count('products')).order_by('-cantidad').filter(cantidad__gt = 2).values('name', 'cantidad')
