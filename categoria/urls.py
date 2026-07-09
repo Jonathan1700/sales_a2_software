@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = 'inventory'
+app_name = 'categoria'
 
 urlpatterns = [
     path('categorias/', views.CategoriaListView.as_view(), name='categoria_list'),
@@ -9,6 +9,5 @@ urlpatterns = [
     path('categorias/create/', views.CategoriaCreateView.as_view(), name='categoria_create'),
     path('categorias/<int:pk>/edit/', views.CategoriaUpdateView.as_view(), name='categoria_update'),
     path('categorias/<int:pk>/delete/', views.CategoriaDeleteView.as_view(), name='categoria_delete'),
-    
 
 ]

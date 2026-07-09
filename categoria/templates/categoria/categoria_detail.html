@@ -1,0 +1,30 @@
+{% extends 'billing/base.html' %}
+{% block title %}Detalle de la Categoría{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="mb-0 fw-bold">Detalle de la Categoría</h2>
+  <a href="{% url 'categoria:categoria_list' %}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Volver
+  </a>
+</div>
+<div class="card shadow border-0">
+  <div class="card-body p-4">
+    <h3 class="fw-bold mb-2">{{ categoria.nombre }}</h3>
+    <span class="badge {% if categoria.activo %}bg-success{% else %}bg-secondary{% endif %} mb-3">
+      {% if categoria.activo %}Activo{% else %}Inactivo{% endif %}
+    </span>
+    <div class="row g-3">
+      <div class="col-12"><div class="p-3 rounded bg-light h-100">
+        <p class="text-muted small mb-1 fw-semibold">DESCRIPCIÓN</p>
+        <p class="mb-0">{{ categoria.descripcion|default:"—" }}</p>
+      </div></div>
+    </div>
+  </div>
+  <div class="card-footer bg-light">
+    <div class="d-flex justify-content-end gap-2">
+      <a href="{% url 'categoria:categoria_update' categoria.pk %}" class="btn btn-warning"><i class="bi bi-pencil-fill"></i> Editar</a>
+      <a href="{% url 'categoria:categoria_delete' categoria.pk %}" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Eliminar</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

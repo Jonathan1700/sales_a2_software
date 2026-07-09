@@ -28,10 +28,10 @@ INSTALLED_APPS = [
     'billing',  # Nuestra app
 
     'django_extensions',
-    'purchasing', 
-    'inventory',
+    'purchasing',
     'security',
-    'rrhh'
+    'rrhh',
+    'categoria',
 
 ]
 

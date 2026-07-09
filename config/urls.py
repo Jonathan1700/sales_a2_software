@@ -6,10 +6,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('purchases/', include('purchasing.urls')),  
-    path('inventory/', include('inventory.urls')),
-    path('security/', include('security.urls')), 
-    path('rrhh/', include('rrhh.urls')),     
+    path('purchases/', include('purchasing.urls')),
+    path('security/', include('security.urls')),
+    path('rrhh/', include('rrhh.urls')),
+    path('categoria/', include('categoria.urls')),
 
     path('', include('billing.urls')),
 ]
