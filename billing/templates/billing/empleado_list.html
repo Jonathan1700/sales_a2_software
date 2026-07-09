@@ -1,0 +1,37 @@
+{% extends 'billing/base.html' %}
+{% block title %}Empleados{% endblock %}
+{% block content %}
+<h2>Empleados</h2>
+<a href="{% url 'billing:empleado_create' %}" class="btn btn-primary mb-3">+ New Empleado</a>
+<table class="table table-striped table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>first_name </th>
+      <th>Email</th>
+      <th>Cargo</th>
+      <th>Salario</th>
+      <th>departamento</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for i in empleado %}
+    <tr>
+      <td>{{ i.first_name }}</td>
+      <td>{{ i.email }}</td>
+      <td>{{ i.cargo }}</td>
+      <td>{{ i.salario }}</td>
+      <td>{{ i.departamento }}</td>
+
+      <td>
+        <a href="{% url 'billing:empleado_update' i.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="{% url 'billing:empleado_delete' i.pk %}" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" class="text-center">No records.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

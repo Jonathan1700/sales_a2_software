@@ -7,8 +7,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('purchases/', include('purchasing.urls')),  
+    path('inventory/', include('inventory.urls')),
+    path('security/', include('security.urls')), 
+    path('rrhh/', include('rrhh.urls')),     
+
     path('', include('billing.urls')),
 ]
+
+
 
 # Servir archivos media en desarrollo
 if settings.DEBUG:

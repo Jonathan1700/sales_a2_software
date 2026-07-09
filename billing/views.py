@@ -10,6 +10,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
+from .models import Departamento, Empleado
+from .forms import DepartamentoForm, EmpleadoForm
 
 from .models import Brand, ProductGroup, Supplier, Product, Customer, Invoice
 from .forms import (
@@ -23,7 +25,7 @@ from shared.mixins import (
 from shared.decorators import audit_action
 from shared.exports import export_excel, export_pdf
 from shared.columns import columns_context, get_visible_columns, visible_export
-from shared.money import compute_totals
+from shared.money import compute_totals, money
 
 
 # === Columnas dinámicas de Facturas (tabla + PDF + Excel) ===
@@ -578,9 +580,19 @@ def invoice_create(request):
                         prod.stock -= qty
                         prod.save(update_fields=['stock'])
 
-                    subtotal = sum((d.subtotal for d in invoice.details.all()), Decimal('0'))
-                    invoice.subtotal, invoice.tax, invoice.total = compute_totals(subtotal)
+                    subtotal = Decimal('0')       # suma de TODO
+                    base_gravada = Decimal('0')   # solo lo que grava IVA
+
+                    for d in invoice.details.all():
+                        subtotal += d.subtotal
+                        if d.product.grava_iva:            # ← solo si grava
+                            base_gravada += d.subtotal
+
+                    invoice.subtotal = money(subtotal)
+                    invoice.tax = money(base_gravada * Decimal('0.15'))   # IVA solo sobre gravado
+                    invoice.total = invoice.subtotal + invoice.tax
                     invoice.save()
+
 
                     messages.success(request, f'¡Factura #{invoice.id} creada! Total: ${invoice.total}')
                     return redirect('billing:invoice_list')
@@ -723,3 +735,72 @@ def invoice_delete(request, pk):
         messages.success(request, f'¡Factura #{invoice_id} eliminada! Stock repuesto.')
         return redirect('billing:invoice_list')
     return render(request, 'billing/invoice_confirm_delete.html', {'object': invoice})
+
+
+
+class DepartamentoListView(LoginRequiredMixin, ListView):
+    model = Departamento
+    template_name = 'billing/departamento_list.html'
+    paginate_by = 3
+    context_object_name = 'departamentos'
+    
+class DepartamentoDetailView(LoginRequiredMixin, DetailView):
+    model = Departamento
+    template_name = 'billing/departamento_detail.html'
+    context_object_name = 'departamentos'
+
+class DepartamentoCreateView(LoginRequiredMixin, CreateView):
+    model = Departamento
+    form_class = DepartamentoForm
+    template_name = 'billing/departamento_form.html'
+    success_url = reverse_lazy('billing:departamento_list')
+    extra_context = {'page_title': 'Nuevo departamento', 'departamento_url': reverse_lazy('billing:departamento_list')}
+    
+class DepartamentoUpdateView(LoginRequiredMixin, UpdateView):
+    model = Departamento
+    form_class = DepartamentoForm
+    template_name = 'billing/departamento_form.html'
+    success_url = reverse_lazy('billing:departamento_list')
+    extra_context = {'page_title': 'Editar departamento', 'list_url': reverse_lazy('billing:Departamento_list')}
+
+
+class DepartamentoDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = Departamento
+    template_name = 'billing/departamento_confirm_delete.html'
+    success_url = reverse_lazy('billing:departamento_list')
+
+
+
+class EmpleadoListView(LoginRequiredMixin, ListView):
+    model = Empleado
+    template_name = 'billing/empleado_list.html'
+    paginate_by = 3
+    context_object_name = 'empleado'
+    
+    
+class EmpleadoDetailView(LoginRequiredMixin, DetailView):
+    model = Empleado
+    template_name = 'billing/empleado_detail.html'
+    context_object_name = 'empleado'
+
+
+class EmpleadoCreateView(LoginRequiredMixin, CreateView):
+    model = Empleado
+    form_class = EmpleadoForm
+    template_name = 'billing/empleado_form.html'
+    success_url = reverse_lazy('billing:empleado_list')
+    extra_context = {'page_title': 'Nuevo empleado', 'empleado_url': reverse_lazy('billing:empleado_list')}
+    
+    
+class EmpleadoUpdateView(LoginRequiredMixin, UpdateView):
+    model = Empleado
+    form_class = EmpleadoForm
+    template_name = 'billing/empleado_form.html'
+    success_url = reverse_lazy('billing:empleado_list')
+    extra_context = {'page_title': 'Editar Empleado', 'empleado_url': reverse_lazy('billing:empleado_list')}
+
+class EmpleadoDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = Empleado
+    template_name = 'billing/empleado_confirm_delete.html'
+    success_url = reverse_lazy('billing:empleado_list')
+

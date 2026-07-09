@@ -2,7 +2,6 @@ from decimal import Decimal, ROUND_HALF_UP
 from django.db import models
 from shared.validators import validate_cedula_ec
 
-
 class Brand(models.Model):
     """Marcas de productos."""
     name = models.CharField(max_length=100, unique=True, verbose_name='Brand Name')
@@ -69,9 +68,11 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name='Product Image')
     unit_price = models.DecimalField(max_digits=12, decimal_places=2)
     stock = models.IntegerField(default=0)
+    grava_iva = models.BooleanField(default= True, verbose_name= 'Graba el iba del 15%?')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
     class Meta:
         verbose_name = 'Product'
@@ -164,3 +165,35 @@ class InvoiceDetail(models.Model):
     def save(self, *args, **kwargs):
         self.subtotal = self.quantity * self.unit_price
         super().save(*args, **kwargs)
+
+
+class Departamento(models.Model):
+    name = models.CharField(max_length=200, verbose_name='Nombre del Departamento')
+    description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at= models.DateTimeField(auto_now_add= True)
+    
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+    
+    
+class Empleado(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(blank=True, null=True)
+    cargo = models.TextField(max_length=100)
+    salario = models.DecimalField(max_digits=10, decimal_places=2)
+    departamento = models.ForeignKey(Departamento, on_delete=models.PROTECT, related_name='empleados')
+    is_active = models.BooleanField(default=True)
+    created_at= models.DateTimeField(auto_now_add= True)
+    
+    class Meta:
+        ordering = ['first_name']
+    
+    def __str__(self):
+        return self.first_name
+
+    

@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import inlineformset_factory
+from .models import Departamento, Empleado
 
 from .models import Brand, ProductGroup, Supplier, Customer, Invoice, InvoiceDetail, Product
 
@@ -100,7 +101,7 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'brand', 'group', 'suppliers',
-                  'image', 'unit_price', 'stock', 'is_active']
+                  'image', 'unit_price', 'stock', 'grava_iva','is_active']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -134,6 +135,8 @@ class ProductForm(forms.ModelForm):
                 'placeholder': '0',
                 'id': 'id_stock',
             }),
+            
+            'grava_iva': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         help_texts = {
@@ -210,3 +213,28 @@ InvoiceDetailFormSet = inlineformset_factory(
     extra=3,           # 3 filas vacías para agregar
     can_delete=True,   # Checkbox para eliminar filas
 )
+
+class DepartamentoForm(forms.ModelForm):
+   class Meta:
+       model = Departamento
+       fields = ['name', 'description', 'is_active']
+       widgets = {
+         'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Tecnologia', 'autofocus': True}),
+         'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción del departamento..'}),
+          'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class EmpleadoForm(forms.ModelForm):
+    class Meta:
+        model = Empleado
+        fields = ['first_name', 'last_name', 'email', 'cargo', 'salario', 'is_active', 'departamento']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombres'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@dominio.com'}),
+            'cargo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cargo'}),
+            'salario': forms.NumberInput(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'departamento': forms.Select(attrs={'class': 'form-select','placeholder': 'departanento'}),
+        }

@@ -443,3 +443,32 @@ class GenericDetailMixin:
         ctx['update_url'] = reverse(self.update_url_name, args=[obj.pk]) if self.update_url_name else ''
         ctx['delete_url'] = reverse(self.delete_url_name, args=[obj.pk]) if self.delete_url_name else ''
         return ctx
+
+
+
+class GroupRequiredMixin:
+    """
+    Mixin que verifica si el usuario pertenece a alguno
+    de los roles (grupos) indicados en group_required.
+
+    Uso:
+        class GroupListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+            group_required = ['Administrador']
+    """
+    group_required = []        # Lista de roles permitidos
+    group_redirect_url = '/'   # A dónde redirigir si no tiene el rol
+    group_error_message = 'You do not have permission to access this option.'
+
+    def dispatch(self, request, *args, **kwargs):
+        # 1. Si no inició sesión -> al login
+        if not request.user.is_authenticated:
+            return redirect('login')
+        # 2. El superusuario siempre pasa
+        if request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+        # 3. ¿Pertenece a alguno de los roles permitidos?
+        if request.user.groups.filter(name__in=self.group_required).exists():
+            return super().dispatch(request, *args, **kwargs)
+        # 4. No tiene el rol -> mensaje de error y redirección
+        messages.error(request, self.group_error_message)
+        return redirect(self.group_redirect_url)

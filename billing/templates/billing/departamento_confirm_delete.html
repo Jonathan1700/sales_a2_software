@@ -1,0 +1,9 @@
+{% extends 'billing/base.html' %}
+{% block content %}
+<h2>¿Borrar "{{ object }}"?</h2>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Sí, borrar</button>
+  <a href="{% url 'billing:departamento_list' %}" class="btn btn-secondary">No</a>
+</form>
+{% endblock %}

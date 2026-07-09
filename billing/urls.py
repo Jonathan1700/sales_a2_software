@@ -38,7 +38,7 @@ urlpatterns = [
     path('products/<int:pk>/edit/', views.ProductUpdateView.as_view(), name='product_update'),
     path('products/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),
 
-    # Customer
+    # Customer aca 
     path('customers/', views.CustomerListView.as_view(), name='customer_list'),
     path('customers/<int:pk>/', views.CustomerDetailView.as_view(), name='customer_detail'),
     path('customers/create/', views.CustomerCreateView.as_view(), name='customer_create'),
@@ -51,4 +51,26 @@ urlpatterns = [
     path('invoices/<int:pk>/', views.invoice_detail, name='invoice_detail'),
     path('invoices/<int:pk>/edit/', views.invoice_update, name='invoice_update'),
     path('invoices/<int:pk>/delete/', views.invoice_delete, name='invoice_delete'),
+    
+    # departamentos
+    path('departamentos/', views.DepartamentoListView.as_view(), name='departamento_list'),
+    path('departamentos/<int:pk>/', views.DepartamentoDetailView.as_view(), name='departamento_detail'),
+    path('departamentos/create/', views.DepartamentoCreateView.as_view(), name='departamento_create'),
+    path('departamentos/<int:pk>/edit/', views.DepartamentoUpdateView.as_view(), name='departamento_update'),
+    path('departamentos/<int:pk>/delete/', views.DepartamentoDeleteView.as_view(), name='departamento_delete'),
+
+    
+    path('empleados/', views.EmpleadoListView.as_view(), name='empleado_list'),
+    path('empleados/<int:pk>/', views.EmpleadoDetailView.as_view(), name='empleado_detail'),
+    path('empleados/create/', views.EmpleadoCreateView.as_view(), name='empleado_create'),
+    path('empleados/<int:pk>/edit/', views.EmpleadoUpdateView.as_view(), name='empleado_update'),
+    path('empleados/<int:pk>/delete/', views.EmpleadoDeleteView.as_view(), name='empleado_delete'),
+
+
+
+
+    
+
+    
+    
 ]

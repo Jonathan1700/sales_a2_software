@@ -29,6 +29,9 @@ INSTALLED_APPS = [
 
     'django_extensions',
     'purchasing', 
+    'inventory',
+    'security',
+    'rrhh'
 
 ]
 
