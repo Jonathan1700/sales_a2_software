@@ -10,5 +10,5 @@ class CargoForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del cargo'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción del cargo'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
+        }   
      
